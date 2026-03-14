@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}AI Dashboard | Traffic Violation AI{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4">AI Traffic Violation Dashboard</h2>
+
+<!-- ================= STAT CARDS ================= -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="stat-number" data-count="{{ stats.total_motorcycles }}">0</div>
+            <div>Total Motorcycles</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="stat-number text-danger" data-count="{{ stats.helmet_violations }}">0</div>
+            <div>Helmet Violations</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card stat-card">
+            <div class="stat-number text-success" data-count="{{ processing_time }}">0</div>
+            <div>Processing Time (s)</div>
+        </div>
+    </div>
+</div>
+
+<!-- ================= VIDEO ================= -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>Processed Video</h5>
+        <video width="100%" controls>
+            <source src="{{ video_url }}" type="video/mp4">
+        </video>
+    </div>
+</div>
+
+<!-- ================= CHART ================= -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>Helmet Violation Analysis</h5>
+        <canvas id="helmetChart"></canvas>
+    </div>
+</div>
+
+<!-- ================= EVIDENCE ================= -->
+<div class="card mb-4">
+    <div class="card-body">
+        <h5>Violation Evidence</h5>
+
+        {% if faces or plates %}
+        <div class="row mt-3">
+            {% for face in faces %}
+            <div class="col-md-3 mb-3">
+                <img src="{{ face }}" class="img-fluid">
+                <small class="d-block text-center">Rider Face</small>
+            </div>
+            {% endfor %}
+
+            {% for plate in plates %}
+            <div class="col-md-3 mb-3">
+                <img src="{{ plate }}" class="img-fluid">
+                <small class="d-block text-center">License Plate</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="text-muted">No evidence available in demo mode.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ================= ACTION BUTTONS ================= -->
+<a href="/download_evidence" class="btn btn-primary">
+    📦 Download Evidence ZIP
+</a>
+
+<a href="/upload" class="btn btn-secondary ms-2">
+    Analyze Another Video
+</a>
+
+<!-- ================= CHART.JS ================= -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const total = {{ stats.total_motorcycles }};
+const violations = {{ stats.helmet_violations }};
+const compliant = total - violations;
+
+new Chart(document.getElementById('helmetChart'), {
+    type: 'doughnut',
+    data: {
+        labels: ['Helmet Worn', 'No Helmet'],
+        datasets: [{
+            data: [compliant, violations],
+            backgroundColor: ['#00c6ff', '#ff4d4d'],
+            borderWidth: 0
+        }]
+    }
+});
+</script>
+
+<!-- ================= ANIMATED COUNTERS ================= -->
+<script>
+document.querySelectorAll('.stat-number').forEach(counter => {
+    let target = +counter.getAttribute('data-count');
+    let count = 0;
+    let step = target / 60;
+
+    function update() {
+        count += step;
+        if (count < target) {
+            counter.innerText = Math.round(count);
+            requestAnimationFrame(update);
+        } else {
+            counter.innerText = target;
+        }
+    }
+    update();
+});
+</script>
+
+{% endblock %}

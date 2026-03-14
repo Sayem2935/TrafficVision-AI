@@ -1,0 +1,34 @@
+# ================= DATASETS =================
+
+training_data/
+training_data/images/
+training_data/labels/
+training_data/videos/
+
+# ================= UPLOADED VIDEOS =================
+
+uploads/
+static/uploads/
+
+# ================= AI OUTPUTS =================
+
+static/outputs/
+
+# ================= DATA FILES =================
+
+*.mp4
+*.MOV
+*.avi
+*.jpg
+*.jpeg
+*.png
+
+# ================= PYTHON CACHE =================
+
+**pycache**/
+*.pyc
+
+# ================= DATABASE =================
+
+instance/
+*.db
